@@ -81,11 +81,11 @@ export function VideoInput() {
               <Image
                 src={getYouTubeThumbnail(videoId) || "/placeholder.svg"}
                 alt="Video thumbnail"
-                className="w-full h-full object-cover"
+                // className="w-full h-full"
                 width={1280}
                 height={720}
               />
-              <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center">
+              <div className="absolute inset-0  bg-opacity-20 flex items-center justify-center">
                 <div className="w-16 h-16 rounded-full bg-white bg-opacity-80 flex items-center justify-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

@@ -18,6 +18,7 @@ export function extractVideoId(url: string): string {
 export function getYouTubeThumbnail(videoId: string): string {
   // Return the high-quality thumbnail URL
   const url = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+  console.log("url", url)
   return url
 }
 
