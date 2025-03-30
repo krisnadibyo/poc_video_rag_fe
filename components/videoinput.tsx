@@ -81,7 +81,7 @@ export function VideoInput() {
               <Image
                 src={getYouTubeThumbnail(videoId) || "/placeholder.svg"}
                 alt="Video thumbnail"
-                className="w-full h-full"
+                className="w-full h-full object-cover"
                 width={1280}
                 height={720}
               />
