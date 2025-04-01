@@ -2,68 +2,57 @@
 
 import { revalidatePath } from "next/cache"
 
+const baseUrl = 'http://localhost:8000'
+
 export async function ingestVideo(videoId: string) {
   try {
-    // This is where you would call your actual API endpoint
-    // For demonstration, we'll simulate a successful response
+    const url = `${baseUrl}/ingest`
+    const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `${process.env.API_KEY}`
+      },
+      body: JSON.stringify({ video_id: videoId, url_video: youtubeUrl }),
+    })
 
-    // Example API call:
-    // const response = await fetch('https://your-api.com/ingest', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ videoId }),
-    // })
-
-    // if (!response.ok) {
-    //   throw new Error('Failed to ingest video')
-    // }
-
-    // const data = await response.json()
-
-    // Simulate API delay
-    console.log("Ingesting video:", videoId)
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-
-    // Simulate successful response
+    if (!response.ok) {
+      throw new Error('Failed to ingest video')
+    }
+    
+    const data = await response.json()
+    console.log("Ingested video:", data)
     revalidatePath("/")
-    return { success: true }
+    return { data }
   } catch (error) {
     console.error("Error ingesting video:", error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    }
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
   }
 }
 
 export async function askQuestion(videoId: string, question: string) {
   try {
-    // This is where you would call your actual API endpoint
-    // For demonstration, we'll simulate a response
+    const url = `${baseUrl}/rag`
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `${process.env.API_KEY}`
+      },
+      body: JSON.stringify({ video_id: videoId, question: question }),
+    })
 
-    // Example API call:
-    // const response = await fetch('https://your-api.com/ask', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ videoId, question }),
-    // })
-
-    // if (!response.ok) {
-    //   throw new Error('Failed to get answer')
-    // }
-
-    // const data = await response.json()
-
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-
-    // Simulate response
-    return {
-      answer: `This is a simulated answer about the video (ID: ${videoId}) in response to your question: "${question}". In a real implementation, this would be the response from your RAG system based on the video content.`,
+    if (!response.ok) {
+      throw new Error('Failed to ask question')
     }
+
+    const data = await response.json()
+    console.log("Question answered:", data)
+    return { answer: data.answer }
   } catch (error) {
     console.error("Error asking question:", error)
-    throw error
+    return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
   }
 }
 

@@ -8,6 +8,7 @@ import { Input } from "./ui/input"
 import { extractVideoId, getYouTubeThumbnail } from "../lib/youtube"
 import { ChatInterface } from "./chat-interface"
 import Image from "next/image"
+import { ingestVideo } from "@/lib/actions"
 
 export function VideoInput() {
   const [url, setUrl] = useState("")
@@ -38,15 +39,16 @@ export function VideoInput() {
 
   const handleLearn = async () => {
     if (!videoId) return
-
     setIsLoading(true)
     setError(null)
-
-    // Simulate processing delay
-    setTimeout(() => {
-      setIsLoading(false)
+    const result = await ingestVideo(videoId)
+    if (result.success) {
       setIsIngested(true)
-    }, 1500)
+    } else {
+      setIsIngested(false)
+      setError(result.error || "An unknown error occurred")
+    }
+    setIsLoading(false)
   }
 
   return (
