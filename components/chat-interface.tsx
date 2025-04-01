@@ -5,26 +5,26 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-
+import { askQuestion } from "@/lib/actions"
 interface Message {
   role: "user" | "assistant"
   content: string
 }
 
 // Dummy responses based on common video-related questions
-const dummyResponses: Record<string, string> = {
-  default:
-    "Based on the video content, I can provide you with that information. The video discusses this topic in detail around the middle section.",
-  summary:
-    "The video is about advanced techniques in machine learning, focusing on neural networks and their applications in real-world scenarios. The presenter demonstrates several examples and provides code samples.",
-  main: "The main point of the video is that modern AI systems require both theoretical understanding and practical implementation skills. The speaker emphasizes the importance of hands-on experience.",
-  who: "The person in the video is Dr. Alex Johnson, a renowned AI researcher and educator with over 15 years of experience in the field. They currently work at Tech University and have published numerous papers on machine learning.",
-  when: "This video was published on March 15, 2023. It's part of a series on advanced machine learning techniques that started in early 2023.",
-  where:
-    "The demonstration in the video takes place at the Tech University AI Lab. You can see their specialized equipment and testing environment throughout the presentation.",
-  why: "The purpose of this video is to bridge the gap between theoretical AI concepts and their practical applications. The creator wanted to address common implementation challenges faced by developers.",
-  how: "The technique demonstrated involves three main steps: data preprocessing using specialized algorithms, model training with gradient descent optimization, and evaluation using cross-validation techniques.",
-}
+// const dummyResponses: Record<string, string> = {
+//   default:
+//     "Based on the video content, I can provide you with that information. The video discusses this topic in detail around the middle section.",
+//   summary:
+//     "The video is about advanced techniques in machine learning, focusing on neural networks and their applications in real-world scenarios. The presenter demonstrates several examples and provides code samples.",
+//   main: "The main point of the video is that modern AI systems require both theoretical understanding and practical implementation skills. The speaker emphasizes the importance of hands-on experience.",
+//   who: "The person in the video is Dr. Alex Johnson, a renowned AI researcher and educator with over 15 years of experience in the field. They currently work at Tech University and have published numerous papers on machine learning.",
+//   when: "This video was published on March 15, 2023. It's part of a series on advanced machine learning techniques that started in early 2023.",
+//   where:
+//     "The demonstration in the video takes place at the Tech University AI Lab. You can see their specialized equipment and testing environment throughout the presentation.",
+//   why: "The purpose of this video is to bridge the gap between theoretical AI concepts and their practical applications. The creator wanted to address common implementation challenges faced by developers.",
+//   how: "The technique demonstrated involves three main steps: data preprocessing using specialized algorithms, model training with gradient descent optimization, and evaluation using cross-validation techniques.",
+// }
 
 export function ChatInterface({ videoId }: { videoId: string }) {
   const [messages, setMessages] = useState<Message[]>([
@@ -45,30 +45,30 @@ export function ChatInterface({ videoId }: { videoId: string }) {
     scrollToBottom()
   }, [messages])
 
-  const getDummyResponse = (question: string): string => {
-    // Convert to lowercase for easier matching
-    const q = question.toLowerCase()
+  // const getDummyResponse = (question: string): string => {
+  //   // Convert to lowercase for easier matching
+  //   const q = question.toLowerCase()
 
-    // Check for keywords in the question
-    if (q.includes("summarize") || q.includes("summary") || q.includes("about")) {
-      return dummyResponses.summary
-    } else if (q.includes("main point") || q.includes("key takeaway")) {
-      return dummyResponses.main
-    } else if (q.includes("who") || q.includes("person") || q.includes("speaker")) {
-      return dummyResponses.who
-    } else if (q.includes("when") || q.includes("date") || q.includes("time")) {
-      return dummyResponses.when
-    } else if (q.includes("where") || q.includes("location") || q.includes("place")) {
-      return dummyResponses.where
-    } else if (q.includes("why") || q.includes("purpose") || q.includes("reason")) {
-      return dummyResponses.why
-    } else if (q.includes("how") || q.includes("method") || q.includes("technique")) {
-      return dummyResponses.how
-    }
+  //   // Check for keywords in the question
+  //   if (q.includes("summarize") || q.includes("summary") || q.includes("about")) {
+  //     return dummyResponses.summary
+  //   } else if (q.includes("main point") || q.includes("key takeaway")) {
+  //     return dummyResponses.main
+  //   } else if (q.includes("who") || q.includes("person") || q.includes("speaker")) {
+  //     return dummyResponses.who
+  //   } else if (q.includes("when") || q.includes("date") || q.includes("time")) {
+  //     return dummyResponses.when
+  //   } else if (q.includes("where") || q.includes("location") || q.includes("place")) {
+  //     return dummyResponses.where
+  //   } else if (q.includes("why") || q.includes("purpose") || q.includes("reason")) {
+  //     return dummyResponses.why
+  //   } else if (q.includes("how") || q.includes("method") || q.includes("technique")) {
+  //     return dummyResponses.how
+  //   }
 
-    // Default response if no keywords match
-    return `${dummyResponses.default} The video with ID ${videoId} contains relevant information about your question: "${question}".`
-  }
+  //   // Default response if no keywords match
+  //   return `${dummyResponses.default} The video with ID ${videoId} contains relevant information about your question: "${question}".`
+  // }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -80,22 +80,13 @@ export function ChatInterface({ videoId }: { videoId: string }) {
     // Add user message to chat
     setMessages((prev) => [...prev, { role: "user", content: userMessage }])
     setIsLoading(true)
-
-    // Simulate processing delay
-    setTimeout(() => {
-      // Get appropriate dummy response
-      const response = getDummyResponse(userMessage)
-
-      // Add assistant response to chat
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: response,
-        },
-      ])
-      setIsLoading(false)
-    }, 1500)
+    const {success, answer, error} = await askQuestion(videoId, userMessage)
+    if (success) {
+      setMessages((prev) => [...prev, { role: "assistant", content: answer }])
+    } else {
+      setMessages((prev) => [...prev, { role: "assistant", content: error || "An unknown error occurred" }])
+    }
+    setIsLoading(false)
   }
 
   return (

@@ -49,7 +49,7 @@ export async function askQuestion(videoId: string, question: string) {
 
     const data = await response.json()
     console.log("Question answered:", data)
-    return { answer: data.answer }
+    return { success: true, answer: data.answer }
   } catch (error) {
     console.error("Error asking question:", error)
     return { success: false, error: error instanceof Error ? error.message : "Unknown error" }
