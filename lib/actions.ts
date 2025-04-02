@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 
-const baseUrl = 'http://localhost:8000'
+const baseUrl = process.env.BASE_URL
 
 export async function ingestVideo(videoId: string) {
   try {
