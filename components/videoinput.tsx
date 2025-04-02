@@ -19,8 +19,8 @@ export function VideoInput() {
 
   const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputUrl = e.target.value
-    console.log("inputUrl", inputUrl)
     setUrl(inputUrl)
+    setIsIngested(false)
 
     try {
       const id = extractVideoId(inputUrl)
